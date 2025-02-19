@@ -7,7 +7,6 @@ import java.util.Stack;
 
 public class HtmlAnalyzer {
     public static void main(String[] args) {
-        System.out.println("HtmlAnalyzer iniciado.");
 
         if (args.length != 1) {
             System.out.println("Jeito certo de usar: java HtmlAnalyzer <URL>");
@@ -15,25 +14,25 @@ public class HtmlAnalyzer {
         }
 
         String urlString = args[0];
-        System.out.println("URL recebida: " + urlString);
 
-        // chamanndo o metodo de baixar
-        String htmlContent = fetchHtml(urlString);
+        try {
+            String htmlContent = fetchHtml(urlString);
+            if (htmlContent == null) {
+                System.out.println("URL connection error");
+                return;
+            }
 
-        if (htmlContent == null) {
+            String deepsestText = extractDeepestText(htmlContent);
+            System.out.println(deepsestText);
+
+        } catch (Exception e) {
             System.out.println("URL connection error");
         }
-
-        System.out.println("Conteúdo HTML obtido:\n" + htmlContent);
-
-        String deepsestText = extractDeepestText(htmlContent);
-        System.out.println(deepsestText);
     }
 
-    // crinado o métode para baixar o html da url
     private static String fetchHtml(String urlString) {
         try {
-            URL url = new URI(urlString).toURL(); // resolvendo url deprecated
+            URL url = new URI(urlString).toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
@@ -60,8 +59,8 @@ public class HtmlAnalyzer {
     private static String extractDeepestText(String html) {
         Stack<String> tagStack = new Stack<>();
         String deepestestText = "";
-        int maxDepth = 0;  // maxima profundiadade
-        int currentDepth = 0; //atual profundidade
+        int maxDepth = 0;
+        int currentDepth = 0;
 
         String[] lines = html.split("\n");
         for (String line : lines) {
@@ -72,7 +71,7 @@ public class HtmlAnalyzer {
                 if (line.startsWith("</")) {
                     if (!tagStack.isEmpty()) {
                         tagStack.pop();
-                        currentDepth--; //dimunui a profundidade atual em 1
+                        currentDepth--;
                     } else {
                         return "malformed HTML";
                     }
